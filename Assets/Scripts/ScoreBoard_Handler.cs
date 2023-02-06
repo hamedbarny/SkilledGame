@@ -6,15 +6,17 @@ using TMPro;
 
 public class ScoreBoard_Handler : MonoBehaviour
 {
+    public static event Action GameIsOver;
+
     [SerializeField] private TextMeshProUGUI txtLevel, txtPoint, txtWin, txtTime;
     [SerializeField] private Scores_Object scoreSO;
 
     bool isTimerRunning = false;
     float totalTime = 4;
 
-    private void Awake()
+    private void Start()
     {
-        scoreSO.startPoints = 1000;
+        totalTime = scoreSO.timeFrame;
         txtPoint.text = scoreSO.startPoints.ToString();
         scoreSO.points = scoreSO.startPoints;
     }
@@ -43,7 +45,11 @@ public class ScoreBoard_Handler : MonoBehaviour
             totalTime -= Time.deltaTime;
             if (totalTime <= 0)
             {
-                print("time up");
+                if (scoreSO.points < 40)
+                {
+                    GameIsOver?.Invoke();
+                }
+                //print("time up");
                 txtTime.text = "0";
                 Game_Handler.canWin = false;
                 isTimerRunning = false;
@@ -63,7 +69,7 @@ public class ScoreBoard_Handler : MonoBehaviour
     private void UpdateTimer()
     {
         isTimerRunning = true;
-        totalTime = 4;
+        totalTime = scoreSO.timeFrame;
     }
     private void StopTimer()
     {
@@ -74,6 +80,7 @@ public class ScoreBoard_Handler : MonoBehaviour
     {
         scoreSO.points += _point;
         txtPoint.text = scoreSO.points.ToString();
+
     }
 
 }

@@ -10,5 +10,6 @@ public class Scores_Object : ScriptableObject
     readonly public List<int> _Chance = new List<int>() { 1, 5, 10, 0, 50, 0, 100, 250, 500, 1000, 2000 };
     public int startPoints;
     public int points;
+    public int timeFrame;
 
 }

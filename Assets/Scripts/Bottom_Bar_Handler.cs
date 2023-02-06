@@ -9,21 +9,27 @@ public class Bottom_Bar_Handler : MonoBehaviour
     public static event Action BtnStart, BtnMax, BtnUp, BtnDown;
     public static event Action<int> LevelUpdated;
     public static event Action<int> StartCost;
+    public static event Action NeedMorePoint;
 
     [SerializeField] private Scores_Object scoreSO;
-    [SerializeField] private List<Button> levelBtn;
+    [SerializeField] private Button Start_Button;
+    [SerializeField] private GameObject topTextBar;
     private int currentLevel = 40;
     private int levelCounter = 1;
 
     public void Btn_Start()
     {
+        if (topTextBar.activeInHierarchy) topTextBar.SetActive(false);
         if (scoreSO.points >= currentLevel)
         {
+            ButtonStartCoolDown();
             AffectUpdateScore();
             BtnStart?.Invoke();
             StartCost?.Invoke(currentLevel * -1);
         }
+        else NeedMorePoint?.Invoke();
     }
+    #region btns
     public void Btn_Max()
     {
         currentLevel = 400;
@@ -43,7 +49,7 @@ public class Bottom_Bar_Handler : MonoBehaviour
         UpdateScores(currentLevel);
         BtnDown?.Invoke();
     }
-
+    #endregion
     private void UpdateLevel(int upOrDown)
     {
         levelCounter += upOrDown;
@@ -76,5 +82,17 @@ public class Bottom_Bar_Handler : MonoBehaviour
         scoreSO._Score[2] = scoreSO._9Scores[2];
         scoreSO._Score[1] = scoreSO._9Scores[1];
         scoreSO._Score[0] = scoreSO._9Scores[0];
+    }
+    private void ButtonStartCoolDown()
+    {
+        StartCoroutine(BtnStartCD());
+    }
+
+
+    IEnumerator BtnStartCD()
+    {
+        Start_Button.interactable = false;
+        yield return new WaitForSeconds(2.5f);
+        Start_Button.interactable = true;
     }
 }
