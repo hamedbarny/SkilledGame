@@ -10,12 +10,16 @@ public class ScoreBoard_Handler : MonoBehaviour
 
     [SerializeField] private TextMeshProUGUI txtLevel, txtPoint, txtWin, txtTime;
     [SerializeField] private Scores_Object scoreSO;
+    [SerializeField] private AudioClip tikAudio, timeUpAudio;
 
     bool isTimerRunning = false;
     float totalTime = 4;
+    int timeDif = 0;
+    Transform ears;
 
     private void Start()
     {
+        ears = Camera.main.transform;
         totalTime = scoreSO.timeFrame;
         txtPoint.text = scoreSO.startPoints.ToString();
         scoreSO.points = scoreSO.startPoints;
@@ -27,6 +31,7 @@ public class ScoreBoard_Handler : MonoBehaviour
         Game_Handler.StartTimer += UpdateTimer;
         Bottom_Bar_Handler.BtnStart += StopTimer;
         Bottom_Bar_Handler.StartCost += UpdatePoint;
+        Game_Handler.StopTimer += StopTimer;
     }
     private void OnDisable()
     {
@@ -35,6 +40,7 @@ public class ScoreBoard_Handler : MonoBehaviour
         Game_Handler.StartTimer -= UpdateTimer;
         Bottom_Bar_Handler.BtnStart -= StopTimer;
         Bottom_Bar_Handler.StartCost -= UpdatePoint;
+        Game_Handler.StopTimer -= StopTimer;
     }
     private void Update()
     {
@@ -43,14 +49,19 @@ public class ScoreBoard_Handler : MonoBehaviour
             int timeToInt = (int)totalTime;
             txtTime.text = timeToInt.ToString();
             totalTime -= Time.deltaTime;
+            if(timeToInt != timeDif)
+            {
+                AudioSource.PlayClipAtPoint(tikAudio, ears.position);
+                timeDif = timeToInt;
+            }
             if (totalTime <= 0)
             {
                 if (scoreSO.points < 40)
                 {
                     GameIsOver?.Invoke();
                 }
-                //print("time up");
-                txtTime.text = "0";
+                AudioSource.PlayClipAtPoint(timeUpAudio, ears.position);
+                txtTime.text = "TIME IS UP";
                 Game_Handler.canWin = false;
                 isTimerRunning = false;
             }

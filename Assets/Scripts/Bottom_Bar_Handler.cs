@@ -17,17 +17,28 @@ public class Bottom_Bar_Handler : MonoBehaviour
     private int currentLevel = 40;
     private int levelCounter = 1;
 
+    [SerializeField] private AudioClip startAudio, noMoneyAudio;
+    Transform ear;
+    private void Awake()
+    {
+        ear = Camera.main.transform;
+    }
     public void Btn_Start()
     {
         if (topTextBar.activeInHierarchy) topTextBar.SetActive(false);
         if (scoreSO.points >= currentLevel)
         {
+            AudioSource.PlayClipAtPoint(startAudio, ear.position);
             ButtonStartCoolDown();
             AffectUpdateScore();
             BtnStart?.Invoke();
             StartCost?.Invoke(currentLevel * -1);
         }
-        else NeedMorePoint?.Invoke();
+        else
+        {
+            AudioSource.PlayClipAtPoint(noMoneyAudio, ear.position);
+            NeedMorePoint?.Invoke();
+        }
     }
     #region btns
     public void Btn_Max()

@@ -10,6 +10,8 @@ public class Game_Handler : MonoBehaviour
     #region Events
     public static event Action<int, int> Scored;
     public static event Action StartTimer;
+    public static event Action StopTimer;
+
     #endregion
 
     #region var
@@ -21,7 +23,7 @@ public class Game_Handler : MonoBehaviour
     List<int> _slots;
     List<int> _scores;
     int k = 0, repeatAllowed = 3, internalCounter;
-    [SerializeField] private int sProb = 10000;
+    [SerializeField] private int sProb = 1000;
     [SerializeField] private List<TextMeshProUGUI> slotText;
     [SerializeField] private List<Button> slotBtn;
     [SerializeField] private List<Sprite> slotImage;
@@ -30,22 +32,27 @@ public class Game_Handler : MonoBehaviour
     private void OnEnable()
     {
         Bottom_Bar_Handler.BtnStart += Slots;
+        Difficulty_Handler.DifficultyChanged += UpdateDifficulty;
     }
     private void OnDisable()
     {
         Bottom_Bar_Handler.BtnStart -= Slots;
+        Difficulty_Handler.DifficultyChanged -= UpdateDifficulty;
     }
     private void Awake()
     {
         _scores = dataSO._Score;
-        _defaults = new List<int>() { 1, 5, 10, 0, 50, 0, 100, 250, 500, 1000, 2000 };
+        _defaults = new List<int>() { 2, 5, 10, 0, 50, 0, 100, 250, 500, 1000, 2000 };
         _slots = new List<int>() { -1, -1, -1, -1, -1, -1, -1, -1, -1 };
     }
     private void Start()
     {
         //Slots();
     }
-
+    private void UpdateDifficulty(int _val)
+    {
+        sProb = _val;
+    }
     #region Fill Slot
     public void Slots() // fill new slots
     {
@@ -73,7 +80,7 @@ public class Game_Handler : MonoBehaviour
         internalCounter = 0;
         _slots = new List<int> { -1, -1, -1, -1, -1, -1, -1, -1, -1};
         _pool = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        _defaults = new List<int>() { 1, 5, 10, 0, 50, 0, 100, 250, 500, 1000, 2000 };
+        _defaults = new List<int>() { 2, 5, 10, 0, 50, 0, 100, 250, 500, 1000, 2000 };
         _probability = new List<int>() { sProb, sProb, sProb, sProb, sProb, sProb, sProb, sProb, sProb, sProb, sProb };
         k = 0;
 
@@ -232,6 +239,7 @@ public class Game_Handler : MonoBehaviour
         canWin = false;
         int bonusVal = _slots[clickedBtn];
         Scored?.Invoke(totalScore, bonusVal);
+        StopTimer?.Invoke();
         totalScore = 0;
     }
     #endregion
